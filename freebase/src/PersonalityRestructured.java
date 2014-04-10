@@ -36,12 +36,8 @@ public class PersonalityRestructured {
 		System.out.println("Initializing.");
 		PersonalityRestructured pr = new PersonalityRestructured();
 		System.out.println("Starting Analysis.");
-		try {
-			pr.getPersonalityProfile();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
+		pr.getPersonalityProfile();
+		pr.getBig5Personality();
 		long EndTime = System.currentTimeMillis();
 		double timeTaken = (EndTime-StartTime)/60000;
 		System.out.println( "Done in "+timeTaken+" minutes.");
@@ -50,6 +46,8 @@ public class PersonalityRestructured {
 		for(Entry entry:pr.personalityProfile.entrySet()){
 			System.out.println(entry.getKey().toString()+" : "+entry.getValue().toString());
 		}
+		
+		pr.print("Shivam");
 	}
 
 	HashMap<String,Double> personalityProfile;
@@ -62,10 +60,27 @@ public class PersonalityRestructured {
                     new HirstStOnge(db), new LeacockChodorow(db), new Lesk(db),  new WuPalmer(db), 
                     new Resnik(db), new JiangConrath(db), new Lin(db), new Path(db)
                     };
+    List<String> Openness_to_experience,Conscientiousness,Extraversion,Agreeableness,Neuroticism;
+	List<String> VS_Openness_to_experience,VS_Conscientiousness,VS_Extraversion,VS_Agreeableness,VS_Neuroticism ;
+	List<String> completeTraitList = null;
 	
 	public PersonalityRestructured() {
+		
 		super();
 		WS4JConfiguration.getInstance().setMFS(true);
+		this.Openness_to_experience = Arrays.asList(new String[]{"inventive","curious"});
+		this.Conscientiousness = Arrays.asList(new String[]{"efficient","organized"});
+		this.Extraversion = Arrays.asList(new String[]{"outgoing","energetic"});
+		this.Agreeableness = Arrays.asList(new String[]{"friendly","compassionate"});
+		this.Neuroticism = Arrays.asList(new String[]{"sensitive","nervous"});
+		
+		this.VS_Openness_to_experience = Arrays.asList(new String[]{"consistent","cautious"});// 1 - Ave[]
+		this.VS_Conscientiousness = Arrays.asList(new String[]{"easy going","careless"});// 1 - Ave[]
+		this.VS_Extraversion = Arrays.asList(new String[]{"solitary","reserved"});// 1 - Ave[]
+		this.VS_Agreeableness = Arrays.asList(new String[]{"analytical","detached"});// 1 - Ave[]
+		this.VS_Neuroticism = Arrays.asList(new String[]{"secure","confident"});// 1 - Ave[]
+		setCompleteTraitList();
+		
 		this.personalityProfile = new HashMap<String,Double>();
 		this.personalityBig5 = new HashMap<String,Double>();
 		this.likes = new ArrayList<Node>();
@@ -73,30 +88,46 @@ public class PersonalityRestructured {
 		try {
 			System.out.println("Getting Facebook Likes.");
 			likes = getFacebookLikes("Shivam");
-			System.out.println("Getting List of Taits.");
-			traits = getTraits();
-			System.out.println("Expanding Data.");
-			expand();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println("Getting List of Taits.");
+		traits = getTraits();
+		System.out.println("Expanding Data.");
+		expand();
 	}
 
-	//--------------------------------------------------
+	private void setCompleteTraitList(){
+//		List<String> complete = Arrays.asList(new String[]{"inventive","curious","efficient","organized","outgoing","energetic"
+//				,"friendly","compassionate","sensitive","nervous","consistent","cautious"
+//				,"easy going","careless","solitary","reserved","analytical","detached"
+//				,"secure","confident"});
+		completeTraitList = new ArrayList<String>();
+		completeTraitList.addAll(Conscientiousness);
+		completeTraitList.addAll(Extraversion);
+		completeTraitList.addAll(Agreeableness);
+		completeTraitList.addAll(Neuroticism);
+		completeTraitList.addAll(VS_Openness_to_experience);
+		completeTraitList.addAll(VS_Conscientiousness);
+		completeTraitList.addAll(VS_Extraversion);
+		completeTraitList.addAll(VS_Agreeableness);
+		completeTraitList.addAll(VS_Neuroticism);
+	}
+	
 	private void print(String Person){
 		System.out.println("==============================================");
 		System.out.println("Personality Profile for "+Person);
 		System.out.println("==============================================");
-		Double Openness_to_experience = personalityProfile.get("Openness_to_experience") *100;
-		Double Conscientiousness = personalityProfile.get("Conscientiousness")*100;
-		Double Extraversion = personalityProfile.get("Extraversion")*100;
-		Double Agreeableness = personalityProfile.get("Agreeableness")*100;
-		Double Neuroticism = personalityProfile.get("Neuroticism")*100;
+		Double Openness_to_experience = personalityBig5.get("Openness_to_experience") *100;
+		Double Conscientiousness = personalityBig5.get("Conscientiousness")*100;
+		Double Extraversion = personalityBig5.get("Extraversion")*100;
+		Double Agreeableness = personalityBig5.get("Agreeableness")*100;
+		Double Neuroticism = personalityBig5.get("Neuroticism")*100;
 		
 		System.out.println("Openness_to_experience: "+Openness_to_experience+"% [inventive and curious] vs "
 												+ (100-Openness_to_experience)+"% [consistent and cautious]");
 		System.out.println("Conscientiousness: "+Conscientiousness+"% [efficient and organized] vs "
-												+ (100-Conscientiousness)+"% [easy-going and careless]");
+												+ (100-Conscientiousness)+"% [easy going and careless]");
 		System.out.println("Extraversion: "+Extraversion+"% [outgoing and energetic] vs "
 												+ (100-Extraversion)+"% [solitary and reserved]");
 		System.out.println("Agreeableness: "+Agreeableness+"% [friendly and compassionate] vs "
@@ -158,27 +189,10 @@ public class PersonalityRestructured {
 		return sb.toString();
 	}
 	
-	private static List<Node> getTraits(){
-		/*
-		List<String> Openness_to_experience = Arrays.asList(new String[]{"inventive","curious"});
-		List<String> Conscientiousness = Arrays.asList(new String[]{"efficient","organized"});
-		List<String> Extraversion = Arrays.asList(new String[]{"outgoing","energetic"});
-		List<String> Agreeableness = Arrays.asList(new String[]{"friendly","compassionate"});
-		List<String> Neuroticism = Arrays.asList(new String[]{"sensitive","nervous"});
+	private List<Node> getTraits(){
 		
-		List<String> VS_Openness_to_experience = Arrays.asList(new String[]{"consistent","cautious"});// 1 - Ave[]
-		List<String> VS_Conscientiousness = Arrays.asList(new String[]{"easy-going","careless"});// 1 - Ave[]
-		List<String> VS_Extraversion = Arrays.asList(new String[]{"solitary","reserved"});// 1 - Ave[]
-		List<String> VS_Agreeableness = Arrays.asList(new String[]{"analytical","detached"});// 1 - Ave[]
-		List<String> VS_Neuroticism = Arrays.asList(new String[]{"secure","confident"});// 1 - Ave[]
-		*/
-		
-		List<String> complete = Arrays.asList(new String[]{"inventive","curious","efficient","organized","outgoing","energetic"
-														,"friendly","compassionate","sensitive","nervous","consistent","cautious"
-														,"easy-going","careless","solitary","reserved","analytical","detached"
-														,"secure","confident"});
 		List<Node> traits = new LinkedList<Node>();
-		for(String trait:complete){
+		for(String trait:completeTraitList){
 			Node node;
 			try {
 				node = new Node();
@@ -206,16 +220,16 @@ public class PersonalityRestructured {
 		for(Node node:traits){
 			try {
 				node.getAdjacentNodes();
-//				if(node.AdjacentNodes.size()==0)
-//					node.AdjacentNodes.add(node);
-				System.out.println(":::::"+node.name+" : "+node.AdjacentNodes);
+				//if(node.AdjacentNodes.size()==0)
+				//	node.AdjacentNodes.add(node);
+				//System.out.println(":::::"+node.name+" : "+node.AdjacentNodes);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-	private void getPersonalityProfile() throws Exception{
+	private void getPersonalityProfile(){
 		//HashMap<String,Pair> tempProfile = new HashMap<String,Pair>();
 		for(Node trait:traits){
 			System.out.println("Analysing Trait : "+trait.name);
@@ -239,6 +253,57 @@ public class PersonalityRestructured {
 		}
 	}
 	
+	private void getBig5Personality(){
+		setBig5Trait("Openness_to_experience",Openness_to_experience,VS_Openness_to_experience);
+		setBig5Trait("Conscientiousness",Conscientiousness,VS_Conscientiousness);
+		setBig5Trait("Extraversion",Extraversion,VS_Extraversion);
+		setBig5Trait("Agreeableness",Agreeableness,VS_Agreeableness);
+		setBig5Trait("Neuroticism",Neuroticism,VS_Neuroticism);
+	}
+	
+	private void setBig5Trait(String trait ,List<String> featureList,List<String> VS_featureList){
+		System.out.println(":: setBig5Trait: "+trait+" in regards to "+featureList + " VS "+ VS_featureList);
+		double aveRelatedness = 0;
+		double count = 0;
+		for(String feature:featureList){
+				Double relatedness = personalityProfile.get(feature);
+				if(relatedness==null || !personalityProfile.containsKey(feature)){
+					System.out.println("feature not found:"+feature+", relatedness: "+relatedness);
+					continue;
+				}
+				//System.out.println("relatedness: "+relatedness);
+				if(relatedness>0){
+					aveRelatedness+=1-relatedness;
+					count++;
+				}
+		}
+		for(String feature:VS_featureList){
+				Double relatedness = personalityProfile.get(feature);
+				if(relatedness==null || !personalityProfile.containsKey(feature)){
+					System.out.println("feature not found:"+feature+", relatedness: "+relatedness);
+					continue;
+				}
+				if((1-relatedness)<0){
+					relatedness = Double.MIN_NORMAL;
+				}
+				if(relatedness>0){
+					aveRelatedness+=1-relatedness;
+					count++;
+				}
+		}
+		if(aveRelatedness>0)
+			aveRelatedness=aveRelatedness/count;
+		if(Double.isNaN(aveRelatedness) || aveRelatedness<0){
+			aveRelatedness=0;
+		}
+		else if(Double.isInfinite(aveRelatedness)){
+			aveRelatedness=1;
+		}
+		personalityBig5.put(trait, aveRelatedness);
+		//System.out.println(" ::: "+aveRelatedness);
+		//return aveRelatedness;
+	}
+
 	private static double GetSimilarity( Node node1, Node node2 ){
 		double total = 0;
         int count = 0;

@@ -75,11 +75,15 @@ public class Node {
 	}
 	
 	public void getAdjacentNodes() throws Exception{
-		JSONObject wordnetResults = wordnetGet(name);
-		JSONObject freebaseResults = freeBaseGet(name);
-		AdjacentNodes.addAll(getResultList(wordnetResults));
-		AdjacentNodes.addAll(getResultList(freebaseResults));
-		
+		if(isWord){
+			JSONObject wordnetResults = wordnetGet(name);
+			//System.out.println(wordnetResults);
+			AdjacentNodes.addAll(getResultList(wordnetResults));
+		}
+		else{
+			JSONObject freebaseResults = freeBaseGet(name);
+			AdjacentNodes.addAll(getResultList(freebaseResults));
+		}
 	}
 	
 	public ArrayList<Node> getResultList(JSONObject root) throws Exception{
@@ -87,6 +91,7 @@ public class Node {
 		JSONArray result = (JSONArray) root.get("result");
 		for(int i=0;i<result.length();i++){
 			JSONObject obj = result.getJSONObject(i);
+			//System.out.println("obj:"+obj.toString());
 			String nodeMID = obj.getString("mid").toString();
 			String nodeName = obj.getString("name").toString();
 			Node nearbyNode = new Node(nodeMID,nodeName);
@@ -98,7 +103,10 @@ public class Node {
 					JSONObject notable = (JSONObject) obj.get("notable");
 					nearbyNode.name = notable.getString("name").toString();
 					nearbyNode.id = notable.getString("id").toString();
-			}else {
+			}else if(obj.has("lang")){
+				nearbyNode.id = "lang/"+obj.getString("lang");
+			}
+			else {
 				continue;
 			}
 			//System.out.println(nearbyNode.toString());
@@ -106,6 +114,7 @@ public class Node {
 				nearbyNode.hasInformation=true;
 			nodeList.add(nearbyNode);
 		}
+		//System.out.println(nodeList);
 		return nodeList;
 	}
 
