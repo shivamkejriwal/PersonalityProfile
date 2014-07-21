@@ -10,3 +10,24 @@ To gauge the degree of a person’s inventiveness, I have used the semantic simi
 
 
 This project is still in the works and i'm in the process of finding ways to implemnt some of my thoretical assumptions. For example, exapansion of "Lady Gaga" to a set containing “singer”, ”artist”, ”concert”, ”music” etc contaions more noise then acceptable. Untill this gets resolved the acuraccy of my predictions is still low.
+
+
+
+=================
+
+My current implementation of the AI is extremely naive and still needs more data. However, currently it says that a person who likes "Smallville,” "Programming,” "Hotel Transylvania" and "Dancing" is expected to be:-
+
+Openness to experience: 56 % [inventive, curious]           
+                  VS    44 % [consistent, cautious]
+Neuroticism:                   59 % [efficient, organized]         
+                          VS    41 % [easy-going, careless]
+Extraversion:                   38 % [outgoing, energetic]        
+                          VS    62 % [solitary, reserved]
+Conscientiousness:         58 % [friendly, compassionate]  
+                      VS   42 % [analytical, detached]
+Agreeableness:               66 % [sensitive, nervous]          
+                        VS    34 % [secure, confident]
+                        
+                        
+                        
+                        
