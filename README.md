@@ -15,7 +15,7 @@ This project is still in the works and i'm in the process of finding ways to imp
 
 =================
 
-My current implementation of the AI is extremely naive and still needs more data. However, currently it says that a person who likes "Smallville,” "Programming,” "Hotel Transylvania" and "Dancing" is expected to be:-
+My current implementation is extremely naive and still needs more data. However, currently it says that a person who likes "Smallville,” "Programming,” "Hotel Transylvania" and "Dancing" is expected to be:-
 
 Openness to experience: 
 56 % [inventive, curious]           
